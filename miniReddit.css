@@ -1,0 +1,51 @@
+li {
+    border-bottom: 1px solid #ececec;
+}
+
+.author_link {
+    text-decoration: none;
+    color: cadetblue;
+}
+
+.title_link {
+    text-decoration: none;
+}
+
+.list-wrapper {
+    display: none;
+}
+
+.hot-listings-list {
+    list-style-type: none;
+}
+
+.rank {
+    top: 38px;
+    position: relative;
+}
+
+.score {
+    position: relative;
+    left: 50px;
+    top: 21px
+}
+
+.author {
+    position: relative;
+    left: 200px;
+    font-size: 14px;
+    color: cadetblue;
+}
+
+.title {
+    position: relative;
+    left: 200px;
+}
+
+.num-comments {
+    position: relative;
+    left: 320px;
+    font-size: 14px;
+    bottom: 17px;
+}
+

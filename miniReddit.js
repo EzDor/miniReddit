@@ -6,40 +6,93 @@ var fetchDataRequest = function () {
     xhr.setRequestHeader("Accept", "application/json");
     xhr.onload = function () {
         document.getElementsByClassName("fetching-text")[0].style.display = 'none';
-        prepareHotListingsList(xhr.response.data.reddit.subreddit.hotListings);
+        prepareListingsList(xhr.response.data.reddit.subreddit.controversialListings);
     };
-    var reqString = '{ reddit { subreddit(name: "pics"){ hotListings(limit: 10) { url score title numComments author { username } } } } }';
+    var reqString = '{ reddit { subreddit(name: "pics"){ controversialListings(limit: 10) { url score title numComments author { username } } } } }';
     xhr.send(JSON.stringify({query: reqString}));
 };
 
-var prepareHotListingsList = function (fetchingData) {
-    var PICS_LIST_OFFSET = 2;
+var prepareListingsList = function (fetchingData) {
     document.getElementsByClassName('list-wrapper')[0].style.display = 'block';
-    var hotListingsList = document.getElementsByClassName('hot-listings-list')[0];
+    var listingsList = document.getElementsByClassName('listings-list')[0];
+    for (var i = 0; i < fetchingData.length; i++) {
+        var listItemDetails = [
+            {
+                'type': 'div',
+                'class': 'rank',
+                'value': i + 1
+            },
+            {
+                'type': 'div',
+                'class': 'score',
+                'value': fetchingData[i].score
+            },
+            {
+                'type': 'a',
+                'class': 'title',
+                'value': fetchingData[i].title,
+                'onClick': 'showImage("' + fetchingData[i].url + '")'
+            },
+            {
+                'type': 'a',
+                'class': 'author',
+                'value': fetchingData[i].author.username,
+                'target': '_blank',
+                'href': 'https://www.reddit.com/user/' + fetchingData[i].author.username
+            },
+            {
+                'type': 'div',
+                'class': 'num-comments',
+                'value': fetchingData[i].numComments + ' Comments'
+            }
 
-    //create list and append html
-    for (var i = PICS_LIST_OFFSET; i < fetchingData.length; i++) {
-        var id = i - 1;
-        var newLI = document.createElement('li');
-        var score = '<div class="score">' + fetchingData[i].score + '</div>';
-        var author = '<div class="author"><a class="author_link" target="_blank" href="https://www.reddit.com/user/' + fetchingData[i].author.username + '">' + fetchingData[i].author.username + '</a></div>';
-        var title = '<div class="title"><a class="title_link" href="' + fetchingData[i].url + '" target="_blank">' + fetchingData[i].title + '</a></div>';
-        var numOfComments = '<div class="num-comments">' + fetchingData[i].numComments + ' Comments</div>';
-        var rank = '<div class="rank">' + id + '</div>';
-        var html = rank + score + title + author + numOfComments;
-        appendHtml(newLI, html);
-        hotListingsList.appendChild(newLI);
+        ];
+        var newLI = createListElement(listItemDetails);
+        listingsList.appendChild(newLI);
     }
 
 };
 
-var appendHtml = function (element, htmlString) {
-    var div = document.createElement('div');
-    div.innerHTML = htmlString;
-    while (div.children.length > 0) {
-        element.appendChild(div.children[0]);
+var createListElement = function (innerElementsDetails) {
+    var listElement = document.createElement('li');
+    for (var i = 0; i < innerElementsDetails.length; i++) {
+        var elm = createCustomElement(innerElementsDetails[i]);
+        listElement.appendChild(elm);
+    }
+    return listElement;
+};
+
+var createCustomElement = function (options) {
+    var element = document.createElement(options['type']);
+    var keys = Object.keys(options);
+    keys.forEach(function (option) {
+        if (option === 'value') {
+            element.textContent = options[option];
+        }
+        else if (option !== 'type') {
+            element.setAttribute(option, options[option]);
+        }
+    });
+    return element
+};
+
+var showImage = function (url) {
+    var isImage = url.match(/\.(jpeg|jpg|gif|png)$/) != null;
+    if(isImage){
+        document.getElementsByClassName('list-wrapper')[0].style.display = 'none';
+        document.getElementsByClassName("image-to-show")[0].src = url;
+        document.getElementsByClassName("image-container")[0].style.display = 'block';
+        document.body.style.backgroundColor = "#42f492";
+    }
+    else {
+        window.open(url, '_blank');
     }
 };
 
+var backButtonClicked = function () {
+    document.getElementsByClassName('list-wrapper')[0].style.display = 'block';
+    document.getElementsByClassName("image-container")[0].style.display = 'none';
+    document.body.style.backgroundColor = "#FFFFFF";
+};
 
 fetchDataRequest();
